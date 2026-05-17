@@ -34,7 +34,6 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* ── Shell: header | scroll | footer ─────────────────── */
 .app-shell {
   display: grid;
   grid-template-rows: var(--header-h) 1fr auto;
@@ -61,7 +60,6 @@ body {
   z-index: 1;
 }
 
-/* ── Header ──────────────────────────────────────────── */
 .app-header {
   display: flex;
   align-items: center;
@@ -155,7 +153,6 @@ body {
   background: var(--warning);
 }
 
-/* ── Chat scroll area ────────────────────────────────── */
 .chat-scroll {
   overflow-y: auto;
   overflow-x: hidden;
@@ -180,7 +177,6 @@ body {
   gap: 24px;
 }
 
-/* ── Empty state ─────────────────────────────────────── */
 .empty-state {
   max-width: var(--max-chat);
   margin: 0 auto;
@@ -265,7 +261,6 @@ body {
   flex-shrink: 0;
 }
 
-/* ── Messages ────────────────────────────────────────── */
 .message {
   max-width: var(--max-chat);
   margin: 0 auto;
@@ -399,7 +394,6 @@ body {
   border: 1px solid var(--border);
 }
 
-/* ── Footer / input (fixed row, never overlapped) ────── */
 .chat-footer {
   flex-shrink: 0;
   padding: 16px 20px 20px;
@@ -462,7 +456,6 @@ body {
   cursor: not-allowed;
 }
 
-/* ── Typing ──────────────────────────────────────────── */
 .typing-indicator {
   display: flex;
   gap: 5px;
@@ -493,47 +486,58 @@ body {
   to { transform: rotate(360deg); }
 }
 
-/* ── Telemetry panel (slide-over, no layout shift) ───── */
 .telemetry-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
   z-index: 100;
 }
 
-.telemetry-panel {
+.telemetry-panel-full {
   position: fixed;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  width: min(400px, 100vw);
+  top: 4%;
+  left: 5%;
+  right: 5%;
+  bottom: 4%;
   z-index: 101;
-  background: #111113;
-  border-left: 1px solid var(--border);
+  background: #09090b;
+  border: 1px solid var(--border);
+  border-radius: 16px;
   display: flex;
   flex-direction: column;
-  box-shadow: -8px 0 32px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.8);
+  overflow: hidden;
+}
+
+@media (min-width: 1400px) {
+  .telemetry-panel-full {
+    left: 50%;
+    transform: translateX(-50%) !important;
+    width: 1300px;
+  }
 }
 
 .telemetry-header {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  padding: 20px;
+  padding: 24px 32px;
   border-bottom: 1px solid var(--border);
   flex-shrink: 0;
+  background: var(--bg-elevated);
 }
 
 .telemetry-title-row {
   display: flex;
-  gap: 12px;
+  gap: 16px;
   align-items: center;
 }
 
 .telemetry-title-icon {
-  width: 40px;
-  height: 40px;
-  border-radius: 10px;
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
   background: var(--accent-soft);
   color: var(--accent);
   display: flex;
@@ -542,19 +546,19 @@ body {
 }
 
 .telemetry-header h2 {
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 600;
 }
 
 .telemetry-header p {
-  font-size: 12px;
+  font-size: 13px;
   color: var(--text-muted);
-  margin-top: 2px;
+  margin-top: 4px;
 }
 
 .telemetry-actions {
   display: flex;
-  gap: 6px;
+  gap: 8px;
 }
 
 .icon-btn {
@@ -568,48 +572,73 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: all 0.2s;
 }
 
 .icon-btn:hover {
   color: var(--text);
   background: var(--bg-muted);
+  border-color: #52525b;
 }
 
-.telemetry-body {
+.telemetry-body-grid {
   flex: 1;
   overflow-y: auto;
-  padding: 16px 20px 24px;
+  padding: 32px;
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 32px;
+}
+
+@media (max-width: 900px) {
+  .telemetry-body-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.telemetry-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.telemetry-main {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  min-width: 0;
 }
 
 .telemetry-section {
-  margin-bottom: 24px;
+  display: flex;
+  flex-direction: column;
 }
 
 .telemetry-section h3 {
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.08em;
   color: var(--text-muted);
-  margin-bottom: 12px;
+  margin-bottom: 16px;
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
 }
 
 .status-row {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 10px;
 }
 
 .status-pill {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 500;
-  padding: 6px 10px;
+  padding: 8px 12px;
   border-radius: 8px;
 }
 
@@ -625,24 +654,24 @@ body {
   border: 1px solid rgba(239, 68, 68, 0.25);
 }
 
-.metric-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
+.metric-grid-1col {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .metric-card {
   display: flex;
-  gap: 10px;
-  padding: 12px;
-  border-radius: var(--radius);
+  gap: 12px;
+  padding: 16px;
+  border-radius: 12px;
   background: var(--bg-elevated);
   border: 1px solid var(--border);
 }
 
 .metric-icon {
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   border-radius: 8px;
   background: var(--accent-soft);
   color: var(--accent);
@@ -659,33 +688,35 @@ body {
 }
 
 .metric-label {
-  font-size: 10px;
+  font-size: 11px;
   text-transform: uppercase;
   letter-spacing: 0.05em;
   color: var(--text-muted);
 }
 
 .metric-value {
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 600;
+  margin-top: 2px;
 }
 
 .metric-sub {
-  font-size: 11px;
+  font-size: 12px;
   color: var(--text-muted);
+  margin-top: 2px;
 }
 
 .detail-list {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
 }
 
 .detail-row {
   display: grid;
-  grid-template-columns: 100px 1fr;
-  gap: 8px;
-  font-size: 13px;
+  grid-template-columns: 120px 1fr;
+  gap: 12px;
+  font-size: 14px;
 }
 
 .detail-row dt {
@@ -694,15 +725,17 @@ body {
 
 .detail-row dd {
   color: var(--text);
+  font-weight: 500;
 }
 
 .muted {
   color: var(--text-muted);
+  font-weight: 400;
 }
 
 .ingest-status {
   text-transform: capitalize;
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .ingest-success { color: var(--success); }
@@ -710,27 +743,80 @@ body {
 .ingest-error { color: var(--danger); }
 
 .error-list {
-  margin-top: 10px;
-  padding: 10px;
+  margin-top: 16px;
+  padding: 12px;
   border-radius: 8px;
   background: rgba(239, 68, 68, 0.08);
   border: 1px solid rgba(239, 68, 68, 0.2);
-  font-size: 12px;
+  font-size: 13px;
   color: var(--danger);
+}
+
+.telemetry-charts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+@media (max-width: 1200px) {
+  .telemetry-charts {
+    grid-template-columns: 1fr;
+  }
+}
+
+.chart-section {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+}
+
+.chart-container {
+  width: 100%;
+  margin-top: 8px;
+}
+
+.telemetry-details-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+@media (max-width: 1200px) {
+  .telemetry-details-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.info-card {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
 }
 
 .symbol-chips {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
+  gap: 8px;
+  padding-right: 8px;
+}
+
+.symbol-chips::-webkit-scrollbar {
+  width: 4px;
+}
+
+.symbol-chips::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 2px;
 }
 
 .symbol-chip {
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 500;
   font-family: var(--font-geist-mono), monospace;
-  padding: 4px 8px;
-  border-radius: 6px;
+  padding: 6px 10px;
+  border-radius: 8px;
   background: var(--bg-muted);
   border: 1px solid var(--border);
   color: #93c5fd;
@@ -740,16 +826,9 @@ body {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 12px;
-  border-radius: var(--radius);
+  padding: 16px;
+  border-radius: 12px;
   background: rgba(239, 68, 68, 0.08);
   color: var(--danger);
-  font-size: 13px;
-}
-
-.telemetry-footer {
-  font-size: 11px;
-  color: var(--text-muted);
-  text-align: center;
-  padding-top: 8px;
+  font-size: 14px;
 }

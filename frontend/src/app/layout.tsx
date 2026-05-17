@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Streaming RAG Pro",
-  description: "Live market intelligence powered by RAG, Grok, and real-time financial data",
+  description: "Live market intelligence powered by RAG, Groq, and real-time financial data",
 };
 
 export default function RootLayout({

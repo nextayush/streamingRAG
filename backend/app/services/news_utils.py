@@ -1,11 +1,8 @@
-"""Helpers for parsing Yahoo Finance and other news payloads."""
-
 from datetime import datetime
 from typing import Any
 
 
 def _extract_yahoo_article(article: dict[str, Any]) -> dict[str, Any] | None:
-    """Handle legacy and nested yfinance news shapes."""
     title = article.get("title")
     summary = article.get("summary") or article.get("description")
     link = article.get("link")
@@ -59,7 +56,6 @@ def _extract_yahoo_article(article: dict[str, Any]) -> dict[str, Any] | None:
 
 
 def extract_yahoo_articles(news: list[dict[str, Any]], limit: int = 5) -> list[dict[str, Any]]:
-    """Return normalized article dicts from a yfinance news list."""
     articles = []
     for raw in (news or [])[:limit]:
         parsed = _extract_yahoo_article(raw)
@@ -69,7 +65,6 @@ def extract_yahoo_articles(news: list[dict[str, Any]], limit: int = 5) -> list[d
 
 
 def analyze_sentiment(text: str) -> tuple[str, float]:
-    """Return (label, compound_score). Uses VADER when available."""
     try:
         from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 

@@ -30,6 +30,7 @@ export interface Telemetry {
     cycles_completed: number;
     last_cycle_at: string | null;
     last_cycle_duration_ms: number | null;
+    last_cycle_embed_ms: number | null;
     last_status: string;
     last_market_docs: number;
     last_news_docs: number;

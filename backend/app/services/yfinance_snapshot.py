@@ -1,12 +1,9 @@
-"""Build price + 1-month history text from a yfinance Ticker (shared by ingestion & query-time)."""
-
 from typing import Any
 
 from app.services.stocks import STOCK_MAP
 
 
 def build_market_snapshot(symbol: str, ticker: Any) -> str:
-    """Return markdown-style market data block for a symbol."""
     name = STOCK_MAP.get(symbol, symbol)
     info = ticker.fast_info
 

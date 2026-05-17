@@ -5,9 +5,9 @@ from pydantic_settings import BaseSettings
 load_dotenv()
 
 class Settings(BaseSettings):
-    GROK_API_KEY: str = os.getenv("GROK_API_KEY", "")
-    GROK_API_BASE: str = os.getenv("GROK_API_BASE", "https://api.x.ai/v1")
-    GROK_MODEL: str = os.getenv("GROK_MODEL", "grok-beta")
+    GROQ_API_KEY: str = os.getenv("GROQ_API_KEY", "")
+    GROQ_API_BASE: str = os.getenv("GROQ_API_BASE", "https://api.x.ai/v1")
+    GROQ_MODEL: str = os.getenv("GROQ_MODEL", "grok-beta")
     
     MARKETAUX_API_KEY: str = os.getenv("MARKETAUX_API_KEY", "")
     

@@ -1,5 +1,3 @@
-"""Multi-query retrieval with intent-aware boosting."""
-
 import logging
 
 from llama_index.core.retrievers import BaseRetriever
@@ -23,7 +21,6 @@ NEWS_TYPES = frozenset({"NEWS_ARTICLE", "MARKET_NEWS"})
 
 
 class EnrichedRetriever(BaseRetriever):
-    """Intent-aware retrieval with live yfinance injection per ticker."""
 
     def __init__(self, index, reranker, similarity_top_k: int = 6):
         self._base = index.as_retriever(similarity_top_k=similarity_top_k)
@@ -68,7 +65,6 @@ class EnrichedRetriever(BaseRetriever):
 
         nodes = list(merged.values())
 
-        # Intent-specific score boosts before rerank
         for node in nodes:
             meta = node.node.metadata or {}
             sym = meta.get("symbol")
@@ -91,7 +87,6 @@ class EnrichedRetriever(BaseRetriever):
 
         reranked = self._reranker.postprocess_nodes(nodes, query_bundle=query_bundle)
 
-        # Always pin live market snapshots for every detected ticker
         if market_nodes and tickers:
             by_symbol = {n.node.metadata.get("symbol"): n for n in market_nodes}
             pinned = [by_symbol[s] for s in tickers if s in by_symbol]

@@ -1,5 +1,3 @@
-"""Tracked symbols and display names (shared by ingestion and query-time fetch)."""
-
 STOCK_MAP: dict[str, str] = {
     "AAPL": "Apple Inc.",
     "MSFT": "Microsoft Corporation",
@@ -12,4 +10,14 @@ STOCK_MAP: dict[str, str] = {
     "AMD": "Advanced Micro Devices Inc.",
     "INTC": "Intel Corporation",
     "BTC-USD": "Bitcoin",
+    "RELIANCE.NS": "Reliance Industries Limited",
+    "TCS.NS": "Tata Consultancy Services Limited",
+    "HDFCBANK.NS": "HDFC Bank Limited",
+    "INFY.NS": "Infosys Limited",
+    "ICICIBANK.NS": "ICICI Bank Limited",
+    "SBIN.NS": "State Bank of India",
+    "BHARTIARTL.NS": "Bharti Airtel Limited",
+    "ITC.NS": "ITC Limited",
+    "LARSEN.NS": "Larsen & Toubro Limited",
+    "KOTAKBANK.NS": "Kotak Mahindra Bank Limited",
 }

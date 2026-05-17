@@ -26,7 +26,7 @@ export function ChatHeader({
 
       <div className="header-text">
         <h1>Streaming RAG Pro</h1>
-        <p>Live market data · Grok · LlamaIndex</p>
+        <p>Live market data · Groq · LlamaIndex</p>
       </div>
 
       <motion.div className="header-actions">

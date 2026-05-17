@@ -1,5 +1,3 @@
-"""In-process telemetry counters for the /api/telemetry endpoint."""
-
 import time
 from dataclasses import dataclass, field
 from datetime import datetime
@@ -12,6 +10,7 @@ class TelemetryState:
     ingestion_cycles: int = 0
     last_ingestion_at: str | None = None
     last_ingestion_duration_ms: float | None = None
+    last_ingestion_embed_ms: float = 0.0
     last_ingestion_status: str = "pending"
     last_ingestion_market_docs: int = 0
     last_ingestion_news_docs: int = 0
@@ -33,6 +32,7 @@ def uptime_seconds() -> float:
 def record_ingestion_cycle(
     *,
     duration_ms: float,
+    embed_ms: float,
     status: str,
     market_docs: int,
     news_docs: int,
@@ -41,6 +41,7 @@ def record_ingestion_cycle(
     _state.ingestion_cycles += 1
     _state.last_ingestion_at = datetime.now().isoformat()
     _state.last_ingestion_duration_ms = round(duration_ms, 1)
+    _state.last_ingestion_embed_ms = round(embed_ms, 1)
     _state.last_ingestion_status = status
     _state.last_ingestion_market_docs = market_docs
     _state.last_ingestion_news_docs = news_docs

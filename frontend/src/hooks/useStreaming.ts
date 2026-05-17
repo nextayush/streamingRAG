@@ -19,17 +19,15 @@ export const useStreaming = (url: string) => {
   const sendMessage = useCallback(async (query: string) => {
     setIsStreaming(true);
 
-    // Add user message
     const userMessage: Message = { role: 'user', content: query };
     setMessages(prev => [...prev, userMessage]);
 
-    // Placeholder for assistant response
     const assistantMessage: Message = { role: 'assistant', content: '' };
     setMessages(prev => [...prev, assistantMessage]);
 
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 60000); // 60s timeout
+      const timeoutId = setTimeout(() => controller.abort(), 60000);
 
       const response = await fetch(url, {
         method: 'POST',
@@ -40,13 +38,12 @@ export const useStreaming = (url: string) => {
 
       clearTimeout(timeoutId);
 
-      // Handle non-OK responses (e.g. 503 while engine initializes)
       if (!response.ok) {
         let errorMsg = 'Something went wrong. Please try again.';
         try {
           const errBody = await response.json();
           errorMsg = errBody.error || errorMsg;
-        } catch { /* ignore parse errors */ }
+        } catch {}
 
         setMessages(prev => {
           const newMessages = [...prev];
@@ -69,17 +66,14 @@ export const useStreaming = (url: string) => {
 
         buffer += decoder.decode(value, { stream: true });
         const lines = buffer.split('\n');
-        // Keep the last potentially incomplete line in the buffer
         buffer = lines.pop() || '';
 
         for (const line of lines) {
           const trimmed = line.trim();
 
-          // Parse SSE event type
           if (trimmed.startsWith('event: ')) {
             const eventType = trimmed.slice(7);
             if (eventType === 'done') {
-              // Stream is complete, stop reading
               reader.cancel();
               return;
             }
@@ -113,7 +107,6 @@ export const useStreaming = (url: string) => {
               });
             }
           } catch (e) {
-            // Ignore malformed JSON lines (partial SSE data)
           }
         }
       }

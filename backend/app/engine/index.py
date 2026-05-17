@@ -9,17 +9,12 @@ from app.core.config import settings
 
 logger = logging.getLogger(__name__)
 
-# ── Singleton cache ──────────────────────────────────────────────
 _cached_index = None
 _cached_reranker = None
 _engine_ready = False
 
 
 def _create_sparse_encoder():
-    """
-    Create a Splade sparse encoder that explicitly uses the CPU ONNX provider.
-    Must return BatchSparseEncoding = Tuple[List[List[int]], List[List[float]]].
-    """
     from fastembed.sparse.sparse_text_embedding import SparseTextEmbedding
 
     logger.info("Loading Splade sparse model (CPU)...")
@@ -42,10 +37,6 @@ def _create_sparse_encoder():
 
 
 def get_engine():
-    """
-    Returns a cached (index, reranker) tuple.
-    The heavy model downloads only happen on the first call.
-    """
     global _cached_index, _cached_reranker, _engine_ready
 
     if _engine_ready:
@@ -53,26 +44,21 @@ def get_engine():
 
     logger.info("Initializing RAG engine (first call – models will be downloaded)...")
 
-    # 1. Initialize LLM (Grok)
     llm = OpenAILike(
-        model=settings.GROK_MODEL,
-        api_base=settings.GROK_API_BASE,
-        api_key=settings.GROK_API_KEY,
+        model=settings.GROQ_MODEL,
+        api_base=settings.GROQ_API_BASE,
+        api_key=settings.GROQ_API_KEY,
         is_chat_model=True,
         temperature=0.1,
     )
 
-    # 2. Initialize Embeddings (BGE Base)
     embed_model = HuggingFaceEmbedding(model_name="BAAI/bge-base-en-v1.5")
 
-    # Global settings
     Settings.llm = llm
     Settings.embed_model = embed_model
 
-    # 3. Build custom sparse encoder (CPU-only, avoids CUDA fallback bug)
     sparse_fn = _create_sparse_encoder()
 
-    # 4. Initialize Qdrant Vector Store with hybrid search
     client = QdrantClient(url=settings.QDRANT_URL)
     vector_store = QdrantVectorStore(
         client=client,
@@ -82,15 +68,12 @@ def get_engine():
         sparse_query_fn=sparse_fn,
     )
 
-    # 5. Storage Context
     storage_context = StorageContext.from_defaults(vector_store=vector_store)
 
-    # 6. Initialize Index
     _cached_index = VectorStoreIndex.from_vector_store(
         vector_store, storage_context=storage_context
     )
 
-    # 7. Initialize Reranker (Cross-Encoder via sentence-transformers)
     _cached_reranker = SentenceTransformerRerank(
         model="cross-encoder/ms-marco-MiniLM-L-6-v2",
         top_n=10,
@@ -102,7 +85,6 @@ def get_engine():
 
 
 def is_engine_ready() -> bool:
-    """Check whether the engine has finished initializing."""
     return _engine_ready
 
 

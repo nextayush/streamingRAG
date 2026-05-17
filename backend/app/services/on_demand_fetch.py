@@ -1,5 +1,3 @@
-"""Query-time yfinance fetch: live market data + news for detected tickers."""
-
 import logging
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
@@ -68,10 +66,6 @@ def fetch_live_context_for_tickers(
     tickers: list[str],
     limit_news: int = 5,
 ) -> tuple[list[NodeWithScore], list[NodeWithScore]]:
-    """
-    Fetch market snapshot + news per ticker in one yfinance call each.
-    Returns (market_nodes, news_nodes).
-    """
     if not tickers:
         return [], []
 

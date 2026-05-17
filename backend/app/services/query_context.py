@@ -1,4 +1,3 @@
-"""Query understanding: ticker detection, intent, and retrieval query expansion."""
 
 from enum import Enum
 
@@ -126,7 +125,6 @@ class QueryIntent(str, Enum):
 
 
 def detect_tickers(query: str) -> list[str]:
-    """Return unique tickers mentioned in the query."""
     q = query.lower()
     found: list[str] = []
 
@@ -169,7 +167,6 @@ def is_factual_query(query: str) -> bool:
 
 
 def classify_intent(query: str) -> QueryIntent:
-    """Pick the best response mode for this question (first match wins)."""
     if is_comparison_query(query):
         return QueryIntent.COMPARISON
     if is_causal_query(query):

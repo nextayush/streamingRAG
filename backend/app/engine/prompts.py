@@ -1,4 +1,3 @@
-"""Intent-specific LLM prompts for market Q&A."""
 
 from llama_index.core import PromptTemplate
 

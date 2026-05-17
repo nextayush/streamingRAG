@@ -13,11 +13,11 @@ from datetime import datetime
 from app.services.stocks import STOCK_MAP
 
 
-async def fetch_yfinance_data(index) -> tuple[int, int, list[str]]:
-    """Fetch prices/history and news. Returns (market_docs, news_docs, errors)."""
+async def fetch_yfinance_data(index) -> tuple[int, int, list[str], float]:
     market_docs = 0
     news_docs = 0
     errors: list[str] = []
+    embed_ms = 0.0
 
     for symbol, name in STOCK_MAP.items():
         try:
@@ -34,10 +34,11 @@ async def fetch_yfinance_data(index) -> tuple[int, int, list[str]]:
                     "source": "YahooFinance",
                 },
             )
+            t0 = time.perf_counter()
             index.insert(price_doc)
+            embed_ms += (time.perf_counter() - t0) * 1000
             market_docs += 1
 
-            # ── Separate news documents (better retrieval for "why" questions) ──
             articles = extract_yahoo_articles(ticker.news or [], limit=5)
             if articles:
                 for article in articles:
@@ -62,7 +63,9 @@ async def fetch_yfinance_data(index) -> tuple[int, int, list[str]]:
                             "url": article.get("link", ""),
                         },
                     )
+                    t0 = time.perf_counter()
                     index.insert(doc)
+                    embed_ms += (time.perf_counter() - t0) * 1000
                     news_docs += 1
                 print(f"✅ Indexed price + {len(articles)} news articles for {symbol}")
             else:
@@ -73,14 +76,13 @@ async def fetch_yfinance_data(index) -> tuple[int, int, list[str]]:
             print(f"❌ Error fetching YF for {symbol}: {e}")
         await asyncio.sleep(0.5)
 
-    return market_docs, news_docs, errors
+    return market_docs, news_docs, errors, embed_ms
 
 
-async def fetch_marketaux_news(index) -> tuple[int, list[str]]:
-    """Fetch market news from MarketAux with stable IDs and symbol metadata."""
+async def fetch_marketaux_news(index) -> tuple[int, list[str], float]:
     if not settings.MARKETAUX_API_KEY or settings.MARKETAUX_API_KEY == "your_marketaux_api_key":
         print("⚠️ MarketAux API Key not configured. Skipping...")
-        return 0, []
+        return 0, [], 0.0
 
     url = "https://api.marketaux.com/v1/news/all"
     symbols = [s for s in STOCK_MAP.keys() if "-" not in s]
@@ -97,17 +99,17 @@ async def fetch_marketaux_news(index) -> tuple[int, list[str]]:
             response = await client.get(url, params=params)
             if response.status_code != 200:
                 print(f"❌ MarketAux API Error: {response.status_code} - {response.text}")
-                return 0, [f"MarketAux HTTP {response.status_code}"]
+                return 0, [f"MarketAux HTTP {response.status_code}"], 0.0
 
             articles = response.json().get("data", [])
             indexed = 0
+            embed_ms = 0.0
             for article in articles:
                 title = article.get("title", "")
                 description = article.get("description", "") or ""
                 if not title:
                     continue
 
-                # Map entities to tracked tickers
                 entity_symbols = []
                 for entity in article.get("entities", []):
                     sym = entity.get("symbol")
@@ -137,19 +139,20 @@ async def fetch_marketaux_news(index) -> tuple[int, list[str]]:
                         "url": article.get("url", ""),
                     },
                 )
+                t0 = time.perf_counter()
                 index.insert(doc)
+                embed_ms += (time.perf_counter() - t0) * 1000
                 indexed += 1
 
             print(f"✅ Indexed {indexed} articles from MarketAux")
-            return indexed, []
+            return indexed, [], embed_ms
 
     except Exception as e:
         print(f"❌ MarketAux Request Failed: {e}")
-        return 0, [str(e)]
+        return 0, [str(e)], 0.0
 
 
 async def live_ingestion_loop():
-    """Main loop for live data ingestion — runs every 30 seconds."""
     index, _ = get_engine()
 
     while True:
@@ -161,6 +164,7 @@ async def live_ingestion_loop():
         errors: list[str] = []
         market_docs = 0
         news_docs = 0
+        embed_ms = 0.0
         status = "success"
 
         try:
@@ -171,6 +175,7 @@ async def live_ingestion_loop():
             market_docs = yf_result[0]
             news_docs = yf_result[1] + ma_result[0]
             errors = yf_result[2] + ma_result[1]
+            embed_ms = yf_result[3] + ma_result[2]
             if errors:
                 status = "partial"
         except Exception as e:
@@ -179,6 +184,7 @@ async def live_ingestion_loop():
 
         record_ingestion_cycle(
             duration_ms=(time.perf_counter() - started) * 1000,
+            embed_ms=embed_ms,
             status=status,
             market_docs=market_docs,
             news_docs=news_docs,

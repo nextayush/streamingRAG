@@ -1,5 +1,3 @@
-"""Aggregate system telemetry for the dashboard."""
-
 import logging
 from datetime import datetime
 
@@ -61,14 +59,15 @@ def get_telemetry() -> dict:
             "embed_model": "BAAI/bge-base-en-v1.5",
             "sparse_model": "Splade_PP_en_v1",
             "reranker": "cross-encoder/ms-marco-MiniLM-L-6-v2",
-            "llm": settings.GROK_MODEL,
-            "llm_provider": "xAI Grok",
+            "llm": settings.GROQ_MODEL,
+            "llm_provider": "xAI Groq",
         },
         "ingestion": {
             "interval_seconds": 30,
             "cycles_completed": state.ingestion_cycles,
             "last_cycle_at": state.last_ingestion_at,
             "last_cycle_duration_ms": state.last_ingestion_duration_ms,
+            "last_cycle_embed_ms": state.last_ingestion_embed_ms,
             "last_status": state.last_ingestion_status,
             "last_market_docs": state.last_ingestion_market_docs,
             "last_news_docs": state.last_ingestion_news_docs,

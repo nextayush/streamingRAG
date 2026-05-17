@@ -20,16 +20,13 @@ logger = logging.getLogger(__name__)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # 1. Initialize the engine in a thread pool (doesn't block the event loop)
     logger.info("⏳ Warming up RAG engine (downloading models on first run)...")
     loop = asyncio.get_event_loop()
     await loop.run_in_executor(None, get_engine)
     logger.info("✅ Engine is ready. Starting live ingestion...")
 
-    # 2. THEN start the ingestion loop in the background
     task = asyncio.create_task(live_ingestion_loop())
     yield
-    # Cancel the task on shutdown
     task.cancel()
 
 app = FastAPI(title="Streaming RAG Pro", lifespan=lifespan)
@@ -94,14 +91,12 @@ async def stream_query(request: QueryRequest):
         try:
             response = engine.query(request.query)
 
-            # Stream response tokens
             for token in response.response_gen:
                 yield {
                     "event": "message",
                     "data": json.dumps({"token": token}),
                 }
 
-            # Send sources at the end
             sources = []
             for source_node in response.source_nodes:
                 sources.append({
@@ -122,7 +117,6 @@ async def stream_query(request: QueryRequest):
                 "data": json.dumps({"error": str(e)}),
             }
 
-        # Always send done to signal the frontend to stop
         yield {
             "event": "done",
             "data": json.dumps({"status": "completed"}),
